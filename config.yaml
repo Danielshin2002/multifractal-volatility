@@ -1,0 +1,63 @@
+exchanges:
+  - binance
+  - okx
+  - bybit
+  - coinbase
+  - kraken
+
+assets:
+  - BTC/USDT
+  - ETH/USDT
+
+frequencies:
+  - 1m
+  - 5m
+  - 10m
+  - 15m
+
+date_range:
+  start: "2020-01-01"
+  end: "2024-12-31"
+
+preprocessing:
+  window_days: 90                   # 90-day best-window selection (paper §3.2)
+  window_minutes: 129600            # 90 * 1440
+  step_minutes: 1440                # step window in daily increments
+  completeness_threshold: 0.90      # discard windows below 90% completeness
+  tie_break: "most_recent"          # on ties, pick the latest window
+
+estimation:
+  k_rule: "sqrt_n"                  # K_opt = floor(sqrt(N)), paper §3.4
+  p_grid_standard: [0.1, 4.0]      # standard p grid (Cont-Das 2024)
+  p_grid_wide: [0.01, 4.0]         # extended exploratory grid
+  p_grid_steps: 100
+  moment_orders: [-4, -3, -2, -1, 0, 1, 2, 3, 4]   # q for MF-DFA / wavelet
+
+stationarity:
+  adf_significance: 0.05
+  rolling_window_pct: 0.05          # 5% of sample size, min 10 obs
+  max_breakpoints: 5                # binary segmentation max breakpoints
+
+mfdfa:
+  q_min: -4
+  q_max: 4
+  q_steps: 17                       # q ∈ [-4, -3.5, ..., 4]
+  min_scale: 10                     # avoid microstructure noise
+  max_scale_pct: 0.25               # avoid non-stationary drift
+  poly_order: 1                     # linear detrending (DFA-1)
+  n_shuffles: 20                    # shuffle control replicates
+
+moment_scaling:
+  q_min: -4
+  q_max: 4
+  q_steps: 17
+  tau_min: 1
+  tau_max_pct: 0.10                 # max lag as fraction of series length
+
+wavelet:
+  wavelet: "db4"
+  q_min: -4
+  q_max: 4
+  q_steps: 17
+  min_scale_j: 2                    # skip first 2 dyadic scales (noise)
+  max_scale_j: 8
