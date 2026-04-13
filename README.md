@@ -74,7 +74,7 @@ W(L, K, p) = (1/K) * sum_{j=1}^K |S_j|^p  # normalised p-variation
 
 Generalised Hurst exponent `H(q)` estimated via `log F_q(s) ~ H(q) log s`. Curvature in `H(q)` vs `q` signals multifractality. Shuffle control removes temporal dependence to isolate dynamic from distributional multifractality.
 
-## Findings (fill in after running)
+## Findings 
 
 *TBD*
 
