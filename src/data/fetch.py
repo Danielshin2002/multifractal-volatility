@@ -5,7 +5,7 @@ Saves compressed parquet files to data/raw/{exchange}/{asset}/{freq}.parquet.
 No API keys required for public historical data on all supported exchanges.
 
 Usage:
-    python src/data/fetch.py --config config.yaml [--exchange binance] [--asset BTC/USDT]
+    python src/data/fetch.py --config config.yaml [--exchange binanceus] [--asset BTC/USDT]
 """
 
 from __future__ import annotations
@@ -115,20 +115,17 @@ def fetch_and_save(
     end: str,
     out_dir: Path,
 ) -> None:
-    """Fetch one (exchange, asset, timeframe) combination and save to parquet."""
+    """Fetch one (exchange, asset, timeframe) combination and save to parquet.
+
+    Resume-aware: if a partial parquet already exists, picks up from the last
+    saved timestamp rather than restarting from scratch.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # For 10m, fetch 1m and resample (many exchanges lack native 10m support)
     fetch_tf = "1m" if timeframe in SYNTHETIC_TIMEFRAMES else timeframe
+    fetch_tf_ms = TIMEFRAME_TO_MS.get(fetch_tf, 60 * MS_PER_SECOND)
     out_path = out_dir / f"{timeframe}.parquet"
-
-    if out_path.exists():
-        existing = pd.read_parquet(out_path)
-        log.info(
-            "%s/%s/%s already has %d rows; skipping",
-            exchange_name, asset, timeframe, len(existing),
-        )
-        return
 
     try:
         exchange = get_exchange(exchange_name)
@@ -146,24 +143,46 @@ def fetch_and_save(
     since_ms = exchange.parse8601(f"{start}T00:00:00Z")
     until_ms = exchange.parse8601(f"{end}T23:59:59Z")
 
+    # Resume: if a file exists, advance since_ms past the last saved candle
+    existing: pd.DataFrame | None = None
+    if out_path.exists():
+        existing = pd.read_parquet(out_path)
+        last_saved_ts = existing.index.max()
+        last_saved_ms = int(last_saved_ts.timestamp() * MS_PER_SECOND)
+        resume_since_ms = last_saved_ms + fetch_tf_ms
+
+        if resume_since_ms >= until_ms:
+            log.info(
+                "%s/%s/%s complete (%d rows); skipping",
+                exchange_name, asset, timeframe, len(existing),
+            )
+            return
+
+        log.info(
+            "%s/%s/%s resuming from %s (%d rows already saved)",
+            exchange_name, asset, timeframe, last_saved_ts, len(existing),
+        )
+        since_ms = resume_since_ms
+
     log.info(
-        "Fetching %s %s %s from %s to %s",
-        exchange_name, symbol, fetch_tf, start, end,
+        "Fetching %s %s %s from %s",
+        exchange_name, symbol, fetch_tf,
+        pd.Timestamp(since_ms, unit="ms", tz="UTC"),
     )
     candles = fetch_ohlcv_paginated(
         exchange, symbol, fetch_tf, since_ms, until_ms
     )
 
     if not candles:
-        log.warning("No candles returned for %s %s %s", exchange_name, symbol, fetch_tf)
+        log.warning("No new candles returned for %s %s %s", exchange_name, symbol, fetch_tf)
         return
 
-    df = candles_to_df(candles)
+    new_df = candles_to_df(candles)
 
     # Resample 1m → 10m if needed
     if timeframe in SYNTHETIC_TIMEFRAMES and fetch_tf == "1m":
-        df = (
-            df.resample("10min")
+        new_df = (
+            new_df.resample("10min")
             .agg(
                 open=("open", "first"),
                 high=("high", "max"),
@@ -174,10 +193,15 @@ def fetch_and_save(
             .dropna(subset=["close"])
         )
 
+    # Merge with existing data when resuming
+    if existing is not None:
+        df = pd.concat([existing, new_df])
+        df = df[~df.index.duplicated(keep="last")].sort_index()
+    else:
+        df = new_df
+
     df.to_parquet(out_path, compression="gzip")
-    log.info(
-        "Saved %d rows to %s", len(df), out_path
-    )
+    log.info("Saved %d rows to %s", len(df), out_path)
 
 
 def run(config_path: str, exchange_filter: str | None, asset_filter: str | None) -> None:
