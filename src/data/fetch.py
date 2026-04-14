@@ -84,6 +84,20 @@ def fetch_ohlcv_paginated(
         if not candles:
             break
 
+        first_ts = candles[0][0]
+        # Some exchanges (e.g. Kraken) ignore the `since` parameter and always
+        # return the most recent candles. Detect this by checking whether the
+        # first returned timestamp is far ahead of where we asked to start.
+        if first_ts > cursor + batch_size * tf_ms:
+            log.warning(
+                "%s appears to ignore `since` (asked %s, got %s); "
+                "historical pagination not supported for this exchange.",
+                exchange.id,
+                exchange.iso8601(cursor),
+                exchange.iso8601(first_ts),
+            )
+            break
+
         all_candles.extend(candles)
         last_ts = candles[-1][0]
 

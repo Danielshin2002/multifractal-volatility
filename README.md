@@ -1,6 +1,6 @@
 # Multifractality & Rough Volatility: Cross-Exchange Replication Study
 
-Replicates and extends Pontiggia (2025) *"Multifractality in Bitcoin Realized Volatility: Implications for Rough Volatility Modelling"* ([arXiv:2507.00575v3](https://arxiv.org/abs/2507.00575)) by testing whether the paper's findings are robust across the top 5 spot exchanges (Binance, OKX, Bybit, Coinbase, Kraken) and whether they extend to Ethereum.
+Replicates and extends Pontiggia (2025) *"Multifractality in Bitcoin Realized Volatility: Implications for Rough Volatility Modelling"* ([arXiv:2507.00575v3](https://arxiv.org/abs/2507.00575)) by testing whether the paper's findings are robust across BinanceUS, OKX, and Coinbase (geoblocked from Binance and Bybit), and whether they extend to Ethereum. Data spans 2017–2025 where available; analysis covers 2020–2024.
 
 ## Quick Start
 
