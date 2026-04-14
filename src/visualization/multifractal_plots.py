@@ -121,9 +121,9 @@ def run(config_path: str) -> None:
 
     for fpath in sorted(processed_dir.glob("rv_*.parquet")):
         parts = fpath.stem.split("_")
-        if len(parts) < 5:
+        if len(parts) < 6:
             continue
-        exchange, asset, freq, year = parts[1], parts[2], parts[3], parts[4]
+        exchange, asset, freq, year = parts[1], f"{parts[2]}_{parts[3]}", parts[4], parts[5]
         label = f"{exchange}/{asset}/{freq}/{year}"
         slug = fpath.stem[3:]
 

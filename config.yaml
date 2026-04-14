@@ -29,7 +29,7 @@ preprocessing:
 estimation:
   k_rule: "sqrt_n"                  # K_opt = floor(sqrt(N)), paper §3.4
   p_grid_standard: [0.1, 4.0]      # standard p grid (Cont-Das 2024)
-  p_grid_wide: [0.01, 4.0]         # extended exploratory grid
+  p_grid_wide: [0.01, 10.0]         # extended exploratory grid
   p_grid_steps: 100
   moment_orders: [-4, -3, -2, -1, 0, 1, 2, 3, 4]   # q for MF-DFA / wavelet
 

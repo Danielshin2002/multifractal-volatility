@@ -140,6 +140,55 @@ def find_zero_crossing(curve: NDArray[np.float64]) -> float | None:
     return float(1.0 / p_star)
 
 
+def extrapolate_zero_crossing(
+    curve: NDArray[np.float64],
+    tail_frac: float = 0.2,
+) -> float | None:
+    """
+    Extrapolate the zero-crossing beyond the p-grid when no in-grid crossing exists.
+
+    Fits a line to the tail of the log W vs 1/p curve (the last tail_frac fraction,
+    i.e. the largest-p / smallest-1/p region where log W is closest to zero) and
+    extrapolates to log W = 0.
+
+    Returns H = 1/p* (same formula as find_zero_crossing) if the extrapolated
+    crossing is at a positive 1/p*, else None.
+
+    The returned value is negative when inv_p_star < 0, which would mean p* < 0
+    (physically impossible), so None is returned instead. A valid result is a
+    small positive number indicating the roughness index would occur beyond the
+    grid boundary.
+    """
+    if curve.shape[0] < 4:
+        return None
+
+    n_tail = max(4, int(np.ceil(tail_frac * curve.shape[0])))
+    tail = curve[-n_tail:]  # smallest 1/p = largest p = closest to zero
+
+    inv_p = tail[:, 0]
+    log_w = tail[:, 1]
+
+    # Only extrapolate if log W is actually approaching zero (strictly increasing
+    # in the tail as 1/p decreases, i.e. log_w increases left to right when sorted
+    # by decreasing inv_p, which means the last point > first point)
+    if log_w[-1] <= log_w[0]:
+        return None
+
+    # OLS: log_w = a * inv_p + b  →  zero at inv_p* = -b/a
+    A = np.column_stack([inv_p, np.ones(len(inv_p))])
+    coeffs = np.linalg.lstsq(A, log_w, rcond=None)[0]
+    a, b = float(coeffs[0]), float(coeffs[1])
+
+    if abs(a) < 1e-12:
+        return None
+
+    inv_p_star = -b / a
+    if inv_p_star <= 0:
+        return None
+
+    return float(inv_p_star)  # H = 1/p* = inv_p_star
+
+
 def estimate_roughness(
     series: NDArray[np.float64],
     K: int | None = None,
@@ -174,6 +223,8 @@ def estimate_roughness(
     curve = log_W_curve(series, K, p_grid)
 
     H = find_zero_crossing(curve) if curve.shape[0] >= 2 else None
+    if H is None and curve.shape[0] >= 4:
+        H = extrapolate_zero_crossing(curve)
 
     n_block = N // K
     L = K * n_block

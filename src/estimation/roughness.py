@@ -108,15 +108,15 @@ def run(config_path: str) -> None:
         # Expected naming: rv_{exchange}_{asset}_{freq}_{year}.parquet
         stem = fpath.stem
         parts = stem.split("_")
-        if len(parts) < 5:
+        if len(parts) < 6:
             log.warning("Skipping unexpected filename: %s", fpath)
             continue
 
-        # parts: ['rv', exchange, asset, freq, year]
+        # parts: ['rv', exchange, base, quote, freq, year]  e.g. rv_binanceus_BTC_USDT_1m_2024
         exchange = parts[1]
-        asset = parts[2]
-        freq = parts[3]
-        year = parts[4]
+        asset = f"{parts[2]}_{parts[3]}"
+        freq = parts[4]
+        year = parts[5]
         label = f"{exchange}/{asset}/{freq}/{year}"
 
         log.info("Processing %s", label)
