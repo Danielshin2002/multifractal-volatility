@@ -26,10 +26,6 @@ log = logging.getLogger(__name__)
 plt.rcParams.update({"figure.dpi": 150, "font.size": 10})
 
 
-# ---------------------------------------------------------------------------
-# log W(L,K,p) vs 1/p  (paper Fig. 2)
-# ---------------------------------------------------------------------------
-
 def plot_log_W_curve(
     rv: np.ndarray,
     K: int,
@@ -66,10 +62,6 @@ def plot_log_W_curve(
     plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
-# H_hat(K) vs K diagnostic  (paper Figure 1)
-# ---------------------------------------------------------------------------
-
 def plot_H_vs_K(
     rv: np.ndarray,
     label: str,
@@ -100,10 +92,6 @@ def plot_H_vs_K(
     fig.savefig(out_path)
     plt.close(fig)
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

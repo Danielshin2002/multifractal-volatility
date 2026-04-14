@@ -36,10 +36,6 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Wavelet decomposition and leader extraction
-# ---------------------------------------------------------------------------
-
 def compute_wavelet_leaders(
     x: np.ndarray,
     wavelet: str = "db4",
@@ -99,10 +95,6 @@ def compute_wavelet_leaders(
 
     return leaders
 
-
-# ---------------------------------------------------------------------------
-# ζ_q estimation via regression
-# ---------------------------------------------------------------------------
 
 def wavelet_scaling_exponents(
     x: np.ndarray,
@@ -191,10 +183,6 @@ def wavelet_scaling_exponents(
         "log2_Mq": log2_Mq,
     }
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

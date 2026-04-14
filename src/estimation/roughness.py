@@ -19,14 +19,11 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from src.estimation.p_variation import estimate_roughness, k_opt, roughness_vs_K
+from p_variation import estimate_roughness, k_opt, roughness_vs_K
+
 
 log = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Core per-series routine
-# ---------------------------------------------------------------------------
 
 def compute_roughness_for_series(
     rv: np.ndarray,
@@ -70,10 +67,6 @@ def compute_roughness_for_series(
     }
 
 
-# ---------------------------------------------------------------------------
-# K-stability diagnostic curves (paper Fig. 1)
-# ---------------------------------------------------------------------------
-
 def compute_K_stability(
     rv: np.ndarray,
     k_min: int = 50,
@@ -95,10 +88,6 @@ def compute_K_stability(
     )
     return roughness_vs_K(rv, K_values, p_min=p_min, p_max=p_max, n_steps=p_steps)
 
-
-# ---------------------------------------------------------------------------
-# Pipeline: iterate over processed files
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:
@@ -169,10 +158,6 @@ def run(config_path: str) -> None:
     log.info("Saved roughness summary to %s", out_path)
     print(summary.to_string(index=False))
 
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

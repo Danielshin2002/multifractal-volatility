@@ -30,10 +30,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-# ---------------------------------------------------------------------------
-# Core statistic
-# ---------------------------------------------------------------------------
-
 def compute_W(series: NDArray[np.float64], K: int, p: float) -> float:
     """
     Compute the normalised p-variation statistic W(L, K, p).
@@ -75,10 +71,6 @@ def compute_W(series: NDArray[np.float64], K: int, p: float) -> float:
     return float(np.mean(np.abs(block_sums) ** p))
 
 
-# ---------------------------------------------------------------------------
-# K_opt selection (paper §3.4)
-# ---------------------------------------------------------------------------
-
 def k_opt(N: int) -> int:
     """
     Optimal number of blocks following Cont-Das (2024) recommendation.
@@ -90,10 +82,6 @@ def k_opt(N: int) -> int:
     """
     return int(np.floor(np.sqrt(N)))
 
-
-# ---------------------------------------------------------------------------
-# log W curve over a p-grid
-# ---------------------------------------------------------------------------
 
 def log_W_curve(
     series: NDArray[np.float64],
@@ -116,10 +104,6 @@ def log_W_curve(
             rows.append((1.0 / p, np.log(W)))
     return np.array(rows, dtype=np.float64)
 
-
-# ---------------------------------------------------------------------------
-# Zero-crossing detection → roughness index
-# ---------------------------------------------------------------------------
 
 def find_zero_crossing(curve: NDArray[np.float64]) -> float | None:
     """
@@ -155,10 +139,6 @@ def find_zero_crossing(curve: NDArray[np.float64]) -> float | None:
     p_star = 1.0 / inv_p_star
     return float(1.0 / p_star)
 
-
-# ---------------------------------------------------------------------------
-# Convenience: H_hat for a single (series, K, p_grid)
-# ---------------------------------------------------------------------------
 
 def estimate_roughness(
     series: NDArray[np.float64],
@@ -209,10 +189,6 @@ def estimate_roughness(
         "log_W_max": float(curve[:, 1].max()) if curve.shape[0] > 0 else np.nan,
     }
 
-
-# ---------------------------------------------------------------------------
-# K-stability diagnostic (paper §3.4, Figure 1)
-# ---------------------------------------------------------------------------
 
 def roughness_vs_K(
     series: NDArray[np.float64],

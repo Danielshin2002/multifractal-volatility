@@ -29,10 +29,6 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Structure functions
-# ---------------------------------------------------------------------------
-
 def structure_function(
     x: np.ndarray,
     tau: int,
@@ -123,20 +119,12 @@ def scaling_exponents(
     }
 
 
-# ---------------------------------------------------------------------------
-# Multifractality measure: spectral width of ζ_q
-# ---------------------------------------------------------------------------
-
 def spectral_width(zeta_q: np.ndarray) -> float:
     finite = zeta_q[np.isfinite(zeta_q)]
     if len(finite) < 2:
         return np.nan
     return float(finite.max() - finite.min())
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

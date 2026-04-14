@@ -33,10 +33,6 @@ WINDOW_MINUTES = 129_600
 STEP_MINUTES = 1_440  # daily increment
 
 
-# ---------------------------------------------------------------------------
-# 90-day best-window selection (paper §3.2)
-# ---------------------------------------------------------------------------
-
 def select_best_window(
     df_1m: pd.DataFrame,
     year: int,
@@ -105,10 +101,6 @@ def select_best_window(
     return best_slice
 
 
-# ---------------------------------------------------------------------------
-# Resampling to higher timeframes (paper §3.2)
-# ---------------------------------------------------------------------------
-
 def resample_to_freq(
     df_1m: pd.DataFrame,
     freq_minutes: int,
@@ -146,10 +138,6 @@ def compute_completeness(
     n_valid = len(df.dropna(subset=["close"]))
     return n_valid / n_expected
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

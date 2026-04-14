@@ -28,10 +28,6 @@ log = logging.getLogger(__name__)
 plt.rcParams.update({"figure.dpi": 150, "font.size": 10})
 
 
-# ---------------------------------------------------------------------------
-# H(q) spectrum with shuffle overlay
-# ---------------------------------------------------------------------------
-
 def plot_hq_spectrum(
     rv: np.ndarray,
     label: str,
@@ -68,10 +64,6 @@ def plot_hq_spectrum(
     fig.savefig(out_path)
     plt.close(fig)
 
-
-# ---------------------------------------------------------------------------
-# ζ_q curves (moment scaling + wavelet leaders side-by-side)
-# ---------------------------------------------------------------------------
 
 def plot_zeta_q(
     rv: np.ndarray,
@@ -119,10 +111,6 @@ def plot_zeta_q(
     fig.savefig(out_path)
     plt.close(fig)
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

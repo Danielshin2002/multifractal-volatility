@@ -30,10 +30,6 @@ ASSET_COLORS = {"BTC_USDT": "#f7931a", "ETH_USDT": "#627eea",
                 "BTC_USD": "#f7931a", "ETH_USD": "#627eea"}
 
 
-# ---------------------------------------------------------------------------
-# Helper: load and merge summary tables
-# ---------------------------------------------------------------------------
-
 def load_summaries(tables_dir: Path) -> pd.DataFrame:
     """Load and merge p_variation, mfdfa, and moment_scaling summaries."""
     frames = {}
@@ -59,10 +55,6 @@ def load_summaries(tables_dir: Path) -> pd.DataFrame:
 
     return base
 
-
-# ---------------------------------------------------------------------------
-# Plot 1: Spectral width per exchange
-# ---------------------------------------------------------------------------
 
 def plot_spectral_width_by_exchange(
     df: pd.DataFrame,
@@ -102,10 +94,6 @@ def plot_spectral_width_by_exchange(
         log.info("Saved %s", out)
 
 
-# ---------------------------------------------------------------------------
-# Plot 2: BTC vs ETH spectral width comparison
-# ---------------------------------------------------------------------------
-
 def plot_btc_vs_eth(df: pd.DataFrame, figures_dir: Path) -> None:
     col = "spectral_width_mfdfa" if "spectral_width_mfdfa" in df else "spectral_width"
     if col not in df.columns:
@@ -137,10 +125,6 @@ def plot_btc_vs_eth(df: pd.DataFrame, figures_dir: Path) -> None:
     log.info("Saved %s", out)
 
 
-# ---------------------------------------------------------------------------
-# Plot 3: log W heatmap (min/max by exchange × year)
-# ---------------------------------------------------------------------------
-
 def plot_log_W_heatmap(df: pd.DataFrame, figures_dir: Path) -> None:
     col = "log_W_min_std"
     if col not in df.columns:
@@ -167,10 +151,6 @@ def plot_log_W_heatmap(df: pd.DataFrame, figures_dir: Path) -> None:
         plt.close(fig)
         log.info("Saved %s", out)
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

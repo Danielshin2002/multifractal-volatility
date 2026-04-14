@@ -32,10 +32,6 @@ from statsmodels.tsa.stattools import adfuller
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# ADF test (paper §3.6.1)
-# ---------------------------------------------------------------------------
-
 def run_adf(rv: np.ndarray, significance: float = 0.05) -> dict:
     """
     ADF test with AIC lag selection.
@@ -55,10 +51,6 @@ def run_adf(rv: np.ndarray, significance: float = 0.05) -> dict:
         "is_stationary": p_value < significance,
     }
 
-
-# ---------------------------------------------------------------------------
-# Rolling stability (paper §3.6.1)
-# ---------------------------------------------------------------------------
 
 def rolling_stability(
     rv: np.ndarray,
@@ -84,10 +76,6 @@ def rolling_stability(
     }
 
 
-# ---------------------------------------------------------------------------
-# Structural break detection (paper §3.6.1)
-# ---------------------------------------------------------------------------
-
 def detect_breaks(rv: np.ndarray, max_breaks: int = 5) -> dict:
     """
     Binary segmentation with L²-cost; up to max_breaks breakpoints.
@@ -104,10 +92,6 @@ def detect_breaks(rv: np.ndarray, max_breaks: int = 5) -> dict:
         "breakpoint_indices": bkpt_indices,
     }
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

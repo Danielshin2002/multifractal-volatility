@@ -45,10 +45,6 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Core MF-DFA
-# ---------------------------------------------------------------------------
-
 def _profile(x: np.ndarray) -> np.ndarray:
     """Profile Y(i) = Σ_{k=1}^i [x_k - mean(x)]."""
     return np.cumsum(x - x.mean())
@@ -185,10 +181,6 @@ def hurst_exponents(
     }
 
 
-# ---------------------------------------------------------------------------
-# Shuffle control (paper §3.6.2)
-# ---------------------------------------------------------------------------
-
 def shuffle_control(
     x: np.ndarray,
     q_values: np.ndarray,
@@ -219,10 +211,6 @@ def shuffle_control(
         "H_all": H_all,
     }
 
-
-# ---------------------------------------------------------------------------
-# Summary statistics for one series (paper Appendix Tables A.6, A.9)
-# ---------------------------------------------------------------------------
 
 def mfdfa_summary(
     x: np.ndarray,
@@ -272,10 +260,6 @@ def mfdfa_summary(
 
     return result
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:

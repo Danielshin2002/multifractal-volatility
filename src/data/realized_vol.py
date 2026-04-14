@@ -32,18 +32,10 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Log-return computation
-# ---------------------------------------------------------------------------
-
 def log_returns(close: pd.Series) -> pd.Series:
     """Compute log(close_t / close_{t-1}) with NaN at t=0."""
     return np.log(close / close.shift(1))
 
-
-# ---------------------------------------------------------------------------
-# RV_t = |r_t|  (paper §3.3, primary construction)
-# ---------------------------------------------------------------------------
 
 def simple_rv(df: pd.DataFrame) -> pd.Series:
     """
@@ -56,10 +48,6 @@ def simple_rv(df: pd.DataFrame) -> pd.Series:
     r = log_returns(df["close"])
     return r.abs().rename("rv")
 
-
-# ---------------------------------------------------------------------------
-# Noise-robust RV^Δ_t  (paper §3.3 footnote, Fukasawa et al. 2022)
-# ---------------------------------------------------------------------------
 
 def robust_rv(
     df_1m: pd.DataFrame,
@@ -101,10 +89,6 @@ def robust_rv(
     result = np.sqrt(r2["rv_sq"]).rename("rv_robust")
     return result
 
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 def run(config_path: str) -> None:
     with open(config_path) as f:
