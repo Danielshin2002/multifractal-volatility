@@ -24,8 +24,8 @@ data/raw/
 data/processed/
 
 # Results — regenerable; commit selectively if you want figures in the repo
-results/figures/
-results/tables/
+# results/figures/
+# results/tables/
 
 # Conda
 .conda/
