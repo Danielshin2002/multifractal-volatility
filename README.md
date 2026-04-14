@@ -106,6 +106,12 @@ All four H values fall in [0.10, 0.22], indicating very rough volatility well be
 
 The more negative log W_max, the further the curve is from a zero-crossing. OKX BTC at 1m (−0.205) is the most definitively rough series. Coinbase ETH 2020 (−0.103 to −0.106) is the least rough, consistent with its confirmed crossing at p* > 4.
 
+### BTC vs ETH log W(L,K,p) curves — 2020, 1m
+
+![BTC vs ETH log W 2020 1m](results/figures/p_variation/log_W_btc_vs_eth_2020_1m.png)
+
+OKX shows both assets firmly below zero with no crossing. Coinbase shows the ETH curve approaching and crossing zero (H ≈ 0.224), while BTC remains strictly negative — the clearest visualisation of the BTC/ETH divergence in early 2020.
+
 ### BTC vs ETH
 
 ETH has a systematically higher (less negative) log W_max than BTC — mean −0.160 vs −0.194. The gap is most pronounced on Coinbase where 2020 ETH is the only series to yield a roughness index. For all other years and exchanges, ETH's log W curve approaches zero more closely than BTC but still does not cross within the standard grid.

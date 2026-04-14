@@ -93,6 +93,73 @@ def plot_H_vs_K(
     plt.close(fig)
 
 
+def plot_log_W_btc_vs_eth_2020(
+    processed_dir: Path,
+    p_min: float,
+    p_max: float,
+    out_path: Path,
+    freq: str = "1m",
+) -> None:
+    """
+    Side-by-side log W(L,K,p) curves for BTC vs ETH in 2020.
+
+    Panels: one per exchange that has both assets in 2020.
+    BTC = orange (#f7931a), ETH = blue (#627eea).
+    """
+    exchanges = ["okx", "coinbase"]
+    colors = {"BTC_USDT": "#f7931a", "ETH_USDT": "#627eea",
+               "BTC_USD":  "#f7931a", "ETH_USD":  "#627eea"}
+    labels  = {"BTC_USDT": "BTC", "ETH_USDT": "ETH",
+               "BTC_USD":  "BTC", "ETH_USD":  "ETH"}
+
+    fig, axes = plt.subplots(1, len(exchanges), figsize=(5 * len(exchanges), 4), sharey=False)
+
+    for ax, exchange in zip(axes, exchanges):
+        plotted_any = False
+        for asset_slug in ("BTC_USDT", "ETH_USDT", "BTC_USD", "ETH_USD"):
+            fpath = processed_dir / f"rv_{exchange}_{asset_slug}_{freq}_2020.parquet"
+            if not fpath.exists():
+                continue
+
+            df = pd.read_parquet(fpath)
+            if "rv" not in df.columns:
+                continue
+            rv = df["rv"].dropna().to_numpy(dtype=np.float64)
+            if len(rv) < 100:
+                continue
+
+            K = k_opt(len(rv))
+            result = estimate_roughness(rv, K=K, p_min=p_min, p_max=p_max, n_steps=100)
+            curve = result["curve"]
+            if curve.shape[0] == 0:
+                continue
+
+            color = colors[asset_slug]
+            asset_label = labels[asset_slug]
+            ax.plot(curve[:, 0], curve[:, 1], color=color, lw=1.8, label=asset_label)
+
+            if result["H"] is not None:
+                ax.axvline(
+                    result["H"], color=color, lw=1, ls=":",
+                    label=f"{asset_label} H={result['H']:.3f}",
+                )
+            plotted_any = True
+
+        ax.axhline(0, color="k", lw=0.8, ls="--", label="log W = 0")
+        ax.set_xlabel("1/p")
+        ax.set_ylabel("log W(L,K,p)")
+        ax.set_title(f"{exchange.upper()}  |  {freq}  |  2020")
+        if plotted_any:
+            ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path)
+    plt.close(fig)
+    log.info("Saved %s", out_path)
+
+
 def run(config_path: str) -> None:
     with open(config_path) as f:
         cfg = yaml.safe_load(f)
@@ -139,5 +206,25 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config.yaml")
+    parser.add_argument(
+        "--btc-vs-eth-2020",
+        action="store_true",
+        help="Generate BTC vs ETH 2020 log W comparison plot only",
+    )
+    parser.add_argument("--freq", default="1m", help="Frequency for --btc-vs-eth-2020")
     args = parser.parse_args()
-    run(args.config)
+
+    if args.btc_vs_eth_2020:
+        import yaml
+        with open(args.config) as f:
+            cfg = yaml.safe_load(f)
+        p_std = cfg["estimation"]["p_grid_standard"]
+        plot_log_W_btc_vs_eth_2020(
+            processed_dir=Path("data/processed"),
+            p_min=p_std[0],
+            p_max=p_std[1],
+            out_path=Path(f"results/figures/p_variation/log_W_btc_vs_eth_2020_{args.freq}.png"),
+            freq=args.freq,
+        )
+    else:
+        run(args.config)
