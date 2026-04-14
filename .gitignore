@@ -21,11 +21,11 @@ env/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Data — raw and processed files are large; don't commit them
+# Data — raw and processed files are large
 data/raw/
 data/processed/
 
-# Results — regenerable; commit selectively if you want figures in the repo
+# Results 
 # results/figures/
 # results/tables/
 
@@ -44,7 +44,7 @@ htmlcov/
 .vscode/
 .idea/
 
-# Secrets / API keys (safety net)
+
 .env
 *.key
 secrets.yaml
